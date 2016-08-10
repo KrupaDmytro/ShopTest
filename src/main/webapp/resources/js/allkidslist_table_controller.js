@@ -58,13 +58,13 @@ function AllKidsTableController($scope, $window, $location, allKidsTableService)
 
     function loadAllChildren() {
 
-        allKidsTableService.getAllChildren()
-            .then(
-                function( children ) {
-                    applyRemoteChildrenData( children );
-                }
-            )
-        ;
+            allKidsTableService.getAllChildren()
+                .then(
+                    function( children ) {
+                        applyRemoteChildrenData( children );
+                    }
+                )
+            ;
     }
 
     function loadChildren() {

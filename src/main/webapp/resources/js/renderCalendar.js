@@ -9,7 +9,6 @@ var NOT_ACTIVE_EVENT = '#33cc33';
 var BORDER_COLOR = '#000000';
 
 $(function () {
-
     $('#update-recurrent').hide();
     $('#update-recurrent-booking').hide();
 
@@ -30,9 +29,7 @@ $(function () {
         beforeClose: function () {
             $('#deleting-recurrent-event').hide();
         }
-
     });
-
 
     $('.timepicker').timepicker({
         timeFormat: 'H:i',
@@ -40,7 +37,6 @@ $(function () {
         minTime: '15:00',
         maxTime: '22:00'
     });
-
 
     $('.dialog').dialog({
         autoOpen: false,
@@ -64,7 +60,6 @@ $(function () {
     }).closest('.ui-dialog')
         .find('.ui-dialog-title')
         .html('This is one appointment <br> is a series.<br>What would you like to open');
-
 
     $('#updatingButton').click(function () {
 
@@ -151,35 +146,23 @@ $(function () {
 
     $('#cancel-choose').click(function () {
         $('#choose-updating-type').dialog('close');
-
         $('#single-update').prop('checked', true);
-
         $('#recurrent-update').prop('checked', false);
 
     });
 
     $('#update-recurrent').click(function () {
-
         deleteRecurrentEvents(info_event.calEvent.recurrentId);
-        
         createRecurrentEvents();
     });
 });
 
-/**
- *  This function gets events from controller.
- *  After that call renderCalendarForManager for rendering
- */
-
 function selectRoomForManager(id) {
-
     $('#calendar').fullCalendar('destroy');
-
     $.ajax({
         url: 'getroomproperty/' + id,
         success: function(result){
             result = result.split(' ');
-
             result[0] += ":00";
             result[1] += ":00";
 
@@ -188,7 +171,6 @@ function selectRoomForManager(id) {
 
             $.ajax({
                 url: 'getevents/' + id,
-
                 success: function (result) {
                     var objects;
                     if (result.length) {
@@ -212,10 +194,6 @@ function selectRoomForManager(id) {
                         renderCalendarForManager(objects, id, startTime, endTime);
                     } else {
                         $('#calendar').fullCalendar('destroy');
-                        /**
-                         * This object is required for creating empty calendar
-                         * Without this object calendar will not be rendered
-                         */
                         objects = [{
                             title: '1',
                             start: '1',
@@ -242,7 +220,6 @@ function renderCalendarForManager(objects, roomID, workingHoursStart, workingHou
         slotDuration: '00:15:00',
         minTime: workingHoursStart,
         maxTime: workingHoursEnd,
-
         dayClick: function (date) {
             var clickDate = date.format();
 
@@ -259,9 +236,7 @@ function renderCalendarForManager(objects, roomID, workingHoursStart, workingHou
             creatingEvent.clickDate = clickDate;
             creatingEvent.roomID = roomID;
         },
-
         eventClick: function (calEvent) {
-
             if (calEvent.color === NOT_ACTIVE_EVENT) {
                 return;
             }
@@ -271,12 +246,10 @@ function renderCalendarForManager(objects, roomID, workingHoursStart, workingHou
             $('#endDateUpdate').val(calEvent.end.format().substring(0, 10));
             $('#descriptionUpdate').val(calEvent.description);
 
-
             $('#startDate').val(calEvent.title);
             $('#title').val(calEvent.start.format().substring(0, 10));
             $('#endDate').val(calEvent.end.format().substring(0, 10));
             $('#description').val(calEvent.description);
-
 
             var date = new Date(calEvent.start.format());
             var endDate = new Date(calEvent.end.format());
@@ -294,7 +267,6 @@ function renderCalendarForManager(objects, roomID, workingHoursStart, workingHou
             info_event.roomID = roomID;
             info_event.description = $('#descriptionUpdate').val();
 
-
             if (!!calEvent.recurrentId) {
                 $('#choose-updating-type').dialog('open');
             }
@@ -302,17 +274,11 @@ function renderCalendarForManager(objects, roomID, workingHoursStart, workingHou
                 $('#updating').dialog('open');
             }
         },
-
         selectable: true,
         selectHelper: true,
         select: function (start, end) {
-
             $('#dialog').dialog('open');
 
-            /**
-             * This 'if' statement provide that click on day
-             * will have start date and end date the same
-             */
             if (start.format().length < 11) {
                 end = end.add(-1, 'day');
             }
@@ -331,7 +297,6 @@ function renderCalendarForManager(objects, roomID, workingHoursStart, workingHou
             $('#basicExample').timepicker('setTime', timeStart);
             $('#ender').timepicker('setTime', timeEnd);
         },
-
         header: {
             left: 'prev,next today',
             center: 'title',
@@ -426,9 +391,7 @@ function sendRecurrentEventsForCreate(recurrentEvents, dayWhenEventIsRecurrent, 
                 };
 
                 allEvents.push(newRecurrentEvent);
-
                 recurrentEventsForRender.push(newRecurrentEvent);
-
                 $('#calendar').fullCalendar('renderEvent', recurrentEventsForRender[i], true);
             });
         }
@@ -436,7 +399,6 @@ function sendRecurrentEventsForCreate(recurrentEvents, dayWhenEventIsRecurrent, 
 }
 
 function createRecurrentEvents() {
-
     var startDateForCreatingRecurrentEvents = $('#title').val() + 'T00:00:00';
     var endDate = $('#endDate').val() + 'T00:00:00';
 
@@ -470,7 +432,6 @@ function createRecurrentEvents() {
 
         $('#title').val('');
         $('#dialog').dialog('close');
-
         closeDialog('dialog');
         return;
     }
@@ -492,7 +453,6 @@ function createRecurrentEvents() {
             color: eventColor
         }),
         success: function (newId) {
-
             $('#calendar').fullCalendar('removeEvents', ev.id);
 
             ev.id = parseInt(newId);
@@ -502,7 +462,6 @@ function createRecurrentEvents() {
             $('#calendar').fullCalendar('renderEvent', ev);
         }
     });
-
     $('#title').val('');
     $('#dialog').dialog('close');
 
@@ -519,7 +478,6 @@ function closeDialog(divid) {
     $('#days-for-recurrent-form').attr('hidden', true);
     $('#update-recurrent').hide();
     $('#creating').show();
-
 }
 
 function deleteRecurrentEvents(recurrentId) {

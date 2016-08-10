@@ -81,7 +81,7 @@ public class EventMapper implements GenericMapper<Event, EventDto> {
          * The trick is to avoid calling the setter method itself
          * in order to insert null value for that column instead of
          * passing java Null as argument to the setter method.
-        */
+         */
         if(event.getRecurrentId() != null) {
             eventDto.setRecurrentId(event.getRecurrentId());
         }

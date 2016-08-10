@@ -199,14 +199,11 @@ public class BookingServiceImpl extends BaseServiceImpl<Booking> implements Book
         return bookingDao.getMaxRecurrentId();
     }
 
-
     public List<BookingDto> makeRecurrentBookings(List<BookingDto> bookingDtos) {
-        /**
-         * All recurrent bookings have the same date,
-         * this method use date only from first element in list
-         */
+        for (BookingDto bookingDto : bookingDtos) {
+            bookingDto.setIdChild(bookingDto.getKidId());
+        }
 
-        //  SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
         String dateStart = bookingDtos.get(0).getStartTime();
         String dateEnd = bookingDtos.get(0).getEndTime();
 
@@ -222,17 +219,6 @@ public class BookingServiceImpl extends BaseServiceImpl<Booking> implements Book
         daysOFWeek.put("Fri", Calendar.FRIDAY);
         daysOFWeek.put("Sat", Calendar.SATURDAY);
 
-
-
-
-
-     /*   try{
-            dateForRecurrentStart = sdf.parse(dateStart);
-            dateForRecurrentEnd = sdf.parse(dateEnd);
-        } catch (Exception e) {
-            dateForRecurrentStart = null;
-            dateForRecurrentEnd = null;
-        }*/
         Calendar calendar1 = Calendar.getInstance();
         Calendar calendarEndTime = Calendar.getInstance();
         calendarEndTime.setTime(dateForRecurrentEnd);
@@ -243,9 +229,6 @@ public class BookingServiceImpl extends BaseServiceImpl<Booking> implements Book
         String[] days = bookingDtos.get(0).getDaysOfWeek().split(" ");
         Long newRecID = bookingDao.getMaxRecurrentId() + 1;
 
-        /**
-         * This code make Map for bookings (using children) and their new recurrent ID
-         */
         Map<Long, Long> recurrentMap = new HashMap<>(bookingDtos.size());
 
         for (BookingDto bookingDto : bookingDtos) {
@@ -258,21 +241,18 @@ public class BookingServiceImpl extends BaseServiceImpl<Booking> implements Book
         List<BookingDto> newRecurrentBooking = new LinkedList<>();
 
         while (dateForRecurrentEnd.getTime() > calendar.getTimeInMillis()) {
-            for (int i = 0; i < days.length; i++) {
-
+            for (String day : days) {
                 List<BookingDto> dailyBookings = new LinkedList<>();
 
-                calendar.set(Calendar.DAY_OF_WEEK, daysOFWeek.get(days[i]));
+                calendar.set(Calendar.DAY_OF_WEEK, daysOFWeek.get(day));
 
                 if (dateForRecurrentEnd.getTime() < calendar.getTimeInMillis()) break;
                 if (dateForRecurrentStart.getTime() > calendar.getTimeInMillis()) continue;
-
 
                 for (int j = 0; j < bookingDtos.size(); j++) {
                     Booking booking = new Booking();
 
                     booking.setBookingStartTime(calendar.getTime());
-
 
                     calendar1.setTime(calendar.getTime());
                     calendar1.set(Calendar.HOUR, calendarEndTime.get(Calendar.HOUR));
@@ -288,18 +268,17 @@ public class BookingServiceImpl extends BaseServiceImpl<Booking> implements Book
 
                     booking.setUser(userDao.findById(bookingDtos.get(j).getUserId()));
 
-                    //FIXME: fix this 'buf'
-                    BookingDto buf = booking.getDto();
-                    buf.setRoom(room);
-                    buf.setRoomId(room.getId());
+                    BookingDto newBookingDto = booking.getDto();
+                    newBookingDto.setRoom(room);
+                    newBookingDto.setRoomId(room.getId());
 
-                    buf.setDateStartTime(DateUtil.toDateISOFormat(DateUtil.toIsoString(calendar.getTime())));
-                    buf.setDateEndTime(DateUtil.toDateISOFormat(DateUtil.toIsoString(calendar1.getTime())));
+                    newBookingDto.setDateStartTime(DateUtil.toDateISOFormat(DateUtil.toIsoString(calendar.getTime())));
+                    newBookingDto.setDateEndTime(DateUtil.toDateISOFormat(DateUtil.toIsoString(calendar1.getTime())));
 
-                    buf.setUser(userDao.findById(bookingDtos.get(j).getUserId()));
-                    buf.setBookingState(BookingState.BOOKED);
-                    buf.setChild(childDao.findById(buf.getIdChild()));
-                    dailyBookings.add(buf);
+                    newBookingDto.setUser(userDao.findById(bookingDtos.get(j).getUserId()));
+                    newBookingDto.setBookingState(BookingState.BOOKED);
+                    newBookingDto.setChild(childDao.findById(newBookingDto.getIdChild()));
+                    dailyBookings.add(newBookingDto);
                 }
                 newRecurrentBooking.addAll(dailyBookings);
             }
@@ -309,4 +288,3 @@ public class BookingServiceImpl extends BaseServiceImpl<Booking> implements Book
         return persistBookingsFromDtoAndSetId(newRecurrentBooking);
     }
 }
-

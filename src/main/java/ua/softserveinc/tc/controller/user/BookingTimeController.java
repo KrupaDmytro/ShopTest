@@ -38,7 +38,6 @@ public class BookingTimeController {
     @RequestMapping(value = "gwtroomproperty", method = RequestMethod.POST)
     @ResponseBody
     public String getRoomProperty(@RequestBody Integer roomId){
-
         return null;
     }
 
@@ -60,7 +59,6 @@ public class BookingTimeController {
         List<BookingDto> dto = bookingService.persistBookingsFromDtoAndSetId(dtos);
 
         return new Gson().toJson(dto);
-
     }
 
     @RequestMapping(value = "getallbookings/{idUser}/{idRoom}",
@@ -98,14 +96,8 @@ public class BookingTimeController {
             if(bookingDto.getIdChild() == null) {
                 bookingDto.setIdChild(bookingDto.getKidId());
             }
-
-            if(bookingDto.getKidId() == null) {
-                bookingDto.setKidId(bookingDto.getIdChild());
-            }
         }
-        List<BookingDto> bookings = bookingService.makeRecurrentBookings(bookingDtos);
-
-        return new Gson().toJson(bookings);
+        return new Gson().toJson(bookingService.makeRecurrentBookings(bookingDtos));
     }
 
 }

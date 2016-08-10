@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ua.softserveinc.tc.constants.AdminConstants;
+import ua.softserveinc.tc.constants.ErrorConstants;
 import ua.softserveinc.tc.constants.EventConstants;
 import ua.softserveinc.tc.constants.UserConstants;
 import ua.softserveinc.tc.dto.EventDto;
@@ -15,6 +16,7 @@ import ua.softserveinc.tc.entity.Event;
 import ua.softserveinc.tc.entity.User;
 import ua.softserveinc.tc.mapper.GenericMapper;
 import ua.softserveinc.tc.service.CalendarService;
+import ua.softserveinc.tc.service.OrdersService;
 import ua.softserveinc.tc.service.RoomService;
 import ua.softserveinc.tc.service.UserService;
 
@@ -38,6 +40,9 @@ public class ViewEventController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private OrdersService ordersService;
+
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public final String viewHome(Model model, Principal principal) {
         if (principal == null) {
@@ -54,10 +59,15 @@ public class ViewEventController {
                     return EventConstants.View.MAIN_PAGE;
                 case MANAGER:
                     model.addAttribute(UserConstants.Entity.ROOMS, user.getRooms());
+
+                    ordersService.testDB();
+
                     return EventConstants.View.MAIN_PAGE;
-                default:
+                case ADMINISTRATOR:
                     model.addAttribute(AdminConstants.ROOM_LIST, roomService.findAll());
                     return AdminConstants.EDIT_ROOM;
+                default:
+                    return ErrorConstants.ACCESS_DENIED_VIEW;
             }
         }
     }
@@ -70,7 +80,7 @@ public class ViewEventController {
 
     @RequestMapping(value = "getnewevent", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
-    public String getAjax(@RequestBody EventDto eventDto) {
+    public String getNewEvent(@RequestBody EventDto eventDto) {
         return calendarService.create(genericMapper.toEntity(eventDto)).toString();
     }
 
@@ -97,5 +107,4 @@ public class ViewEventController {
     public String getRoomProperty(@PathVariable long id) {
         return calendarService.getRoomWorkingHours(id);
     }
-
 }

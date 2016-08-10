@@ -55,6 +55,9 @@ public class RoomServiceImpl extends BaseServiceImpl<Room> implements RoomServic
     }
 
     /**
+     * This method returns blocked periods
+     * (time when the booking is not possible)
+     * as a Map
      * @param room a requested room
      * @param start start of period
      * @param end end of period

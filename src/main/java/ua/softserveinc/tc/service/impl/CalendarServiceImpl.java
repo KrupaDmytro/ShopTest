@@ -81,8 +81,8 @@ public class CalendarServiceImpl implements CalendarService {
 
 
         while (dateForRecurrentEnd.getTime() > calendar.getTimeInMillis()) {
-            for (int i = 0; i < days.length; i++) {
-                calendar.set(Calendar.DAY_OF_WEEK, daysOFWeek.get(days[i]));
+            for (String day : days) {
+                calendar.set(Calendar.DAY_OF_WEEK, daysOFWeek.get(day));
 
                 if (dateForRecurrentEnd.getTime() < calendar.getTimeInMillis()) break;
                 if (dateForRecurrentStart.getTime() > calendar.getTimeInMillis()) continue;
@@ -91,7 +91,6 @@ public class CalendarServiceImpl implements CalendarService {
                 newRecurrentEvent.setName(recurrentEventDto.getName());
                 newRecurrentEvent.setDescription(recurrentEventDto.getDescription());
                 newRecurrentEvent.setStartTime(calendar.getTime());
-
 
                 calendarWithEndDate.setTime(calendar.getTime());
                 calendarWithEndDate.set(Calendar.HOUR, calendarEndTime.get(Calendar.HOUR));
